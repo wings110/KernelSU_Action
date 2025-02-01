@@ -28,7 +28,8 @@ jobs:
         git clone https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650 -b oneplus/sm8650_v_15.0.0_ace_3_pro kernel_workspace --depth=1
         cd $GITHUB_WORKSPACE/kernel_workspace
         cd kernel_platform
-        git clone https://github.com/OnePlusOSS/android_kernel_oneplus_sm8650 common --depth=1
+        git clone https://github.com/OnePlusOSS/android_kernel_common_oneplus_sm8650 -b oneplus/sm8650_v_15.0.0_ace_3_pro common --depth=1
+        git clone https://github.com/OnePlusOSS/android_kernel_oneplus_sm8650 -b oneplus/sm8650_v_15.0.0_ace_3_pro msm-kernel --depth=1
         # wget https://github.com/PoXiao777/Kernel-Builder_Action/raw/main/patches/last_defconfig
         # mv last_defconfig common/arch/arm64/configs/gki_defconfig
         
