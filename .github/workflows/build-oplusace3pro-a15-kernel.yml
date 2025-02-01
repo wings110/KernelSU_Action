@@ -30,8 +30,8 @@ jobs:
         cd kernel_platform
         git clone https://github.com/OnePlusOSS/android_kernel_common_oneplus_sm8650 -b oneplus/sm8650_v_15.0.0_ace_3_pro common --depth=1
         git clone https://github.com/OnePlusOSS/android_kernel_oneplus_sm8650 -b oneplus/sm8650_v_15.0.0_ace_3_pro msm-kernel --depth=1
-        # wget https://github.com/PoXiao777/Kernel-Builder_Action/raw/main/patches/last_defconfig
-        # mv last_defconfig common/arch/arm64/configs/gki_defconfig
+        wget https://raw.githubusercontent.com/wings110/KernelSU_Action/refs/heads/main/patches/last_defconfig
+        mv last_defconfig common/arch/arm64/configs/gki_defconfig
         
     - name: Download Clang-aosp
       run: |
@@ -46,7 +46,7 @@ jobs:
         rm -rf ./kernel_platform/msm-kernel/android/abi_gki_protected_exports_*
         rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
         
-    - name: clean gki-deconfig files
+    - name: clean some files
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         sed -i 's/check_defconfig//' ./kernel_platform/common/build.config.gki 
@@ -56,11 +56,21 @@ jobs:
         cd $GITHUB_WORKSPACE/kernel_workspace/kernel_platform
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -   
         
-    - name: Setup KernelSU 
-      run: |
+    - name: Setup KernelSU
+      run: |   
         cd $GITHUB_WORKSPACE/kernel_workspace/kernel_platform/KernelSU-Next/kernel
         KSU_VERSION=$(expr $(/usr/bin/git rev-list --count HEAD) "+" 10200)
         sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" Makefile
+
+    - name: Custom Kernel Name
+      run: |
+        cd $GITHUB_WORKSPACE/kernel_workspace/kernel_platform
+        sed -i "s/'%s' -dirty/'%s'/" msm-kernel/scripts/setlocalversion
+        sed -i 's/cut -c1-12/cut -c1-8/' msm-kernel/scripts/setlocalversion
+        sed -i "s/'%s' -dirty/'%s'/" common/scripts/setlocalversion
+        sed -i 's/cut -c1-12/cut -c1-8/' common/scripts/setlocalversion
+        sed -i '/echo "LTO $LTO "/i export LTO=thin' ./oplus/build/oplus_setup.sh       
+
          
     - name: Build kernel
       run: |
@@ -83,7 +93,7 @@ jobs:
         make -j"$THREAD" "${TOOL_ARGS[@]}" O=${OUT_DIR}  ${DEFCONFIG}
         scripts/config --file ${OUT_DIR}/.config -e LTO_CLANG -d LTO_NONE -e LTO_CLANG_THIN -d LTO_CLANG_FULL -e THINLTO
         THREAD=$(($(nproc --all) - 1))
-        make -j"$THREAD" O=${OUT_DIR} "${TOOL_ARGS[@]}"
+        make -j"$THREAD" O=${OUT_DIR} NOKLEAF_LOCALVERSION=1 "${TOOL_ARGS[@]}"
         # make -j"$THREAD" O=${OUT_DIR} "${TOOL_ARGS[@]}" INSTALL_MOD_PATH="." INSTALL_MOD_STRIP=1 modules_install
         
         # rm -rf $GITHUB_WORKSPACE/kernel_workspace/out/lib/modules/5.15.123-Pro+/build
