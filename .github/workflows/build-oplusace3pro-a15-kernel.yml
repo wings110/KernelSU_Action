@@ -56,7 +56,8 @@ jobs:
         cd $GITHUB_WORKSPACE/kernel_workspace/kernel_platform
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -   
         
-    - name: Setup KernelSU    
+    - name: Setup KernelSU 
+      run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/kernel_platform/KernelSU-Next/kernel
         KSU_VERSION=$(expr $(/usr/bin/git rev-list --count HEAD) "+" 10200)
         sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" Makefile
