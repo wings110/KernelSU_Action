@@ -46,7 +46,7 @@ jobs:
         rm -rf ./kernel_platform/msm-kernel/android/abi_gki_protected_exports_*
         rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
         
-    - name: clean some files
+    - name: clean gki-deconfig files
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         sed -i 's/check_defconfig//' ./kernel_platform/common/build.config.gki 
